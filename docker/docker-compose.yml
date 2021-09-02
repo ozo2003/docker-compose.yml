@@ -1,0 +1,124 @@
+version: "3.8"
+
+networks:
+    backend:
+        external:
+            name: backend
+    frontend:
+        external:
+            name: frontend
+
+volumes:
+    baseredisdata:
+    basepostgrelib:
+    basesessions:
+
+services:
+
+    basegateway:
+        image: k0d3r1s/traefik:2.5.2-alpine3.14-amd64
+        container_name: basegateway
+        ports:
+            - 8000:80
+            - 8088:8080
+        networks:
+            - frontend
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./traefik:/etc/traefik
+        restart: always
+        command:
+            - --log
+            - --log.level=ERROR
+            - --api.insecure
+            - --providers.docker
+            - --providers.docker.exposedbydefault=false
+            - --providers.docker.network=frontend
+            - --accessLog
+            - --accessLog.filePath=/etc/traefik/log/access.log
+            - --log.filePath=/etc/traefik/log/error.log
+            - --entryPoints.basehttp.address=:80
+            - --entryPoints.basehttp.forwardedHeaders.insecure
+            - --ping
+            - --ping.entryPoint=basehttp
+            - --providers.docker.watch
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=frontend
+            - traefik.http.routers.basegateway.rule=Host(`basegateway.docker.local`)
+            - traefik.http.routers.basegateway.service=api@internal
+            - traefik.http.routers.basegateway.entrypoints=basehttp
+            - traefik.http.services.basegateway.loadbalancer.server.port=8080
+            - traefik.http.routers.ping.rule=Host(`basegateway.docker.local`) && PathPrefix(`/ping`)
+            - traefik.http.routers.ping.service=ping@internal
+        healthcheck:
+            test: wget --spider https://localhost/ping --no-check-certificate || exit 1
+            interval: 30s
+            timeout: 30s
+            retries: 3
+
+    basepostgres:
+        image: postgres:13.4-alpine3.14
+        container_name: basepostgres
+        environment:
+            POSTGRES_PASSWORD: 'password'
+            TZ: "Europe/Riga"
+        volumes:
+            - basepostgrelib:/var/lib/postgresql/data
+            - ./postgres/data:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        restart: always
+        networks:
+            - backend
+        # ports:
+        #     - 5433:5432
+
+    baseredis:
+        image: redis:6.2.5-alpine3.14
+        container_name: baseredis
+        networks:
+            - backend
+        restart: always
+        volumes:
+            - baseredisdata:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        # ports:
+        #     - 6380:6379
+
+    baseapache:
+        image: k0d3r1s/apache:20210831-rocky8.4-unsafe-amd64
+        container_name: baseapache
+        depends_on:
+            - basephp
+        networks:
+            - backend
+            - frontend
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.baseapache.rule=Host(`base.docker.local`)"
+            - "traefik.docker.network=frontend"
+            - "traefik.http.routers.baseapache.entrypoints=basehttp"
+        volumes:
+            - ../src:/var/www/html
+            - /var/www/html/docker/
+            - basesessions:/var/www/html/var/sessions
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        environment:
+            DOCUMENT_ROOT: /var/www/html/public
+            APACHE_HOST: basephp
+            PHP_HOST: basephp:9000
+
+    basephp:
+        image: k0d3r1s/php-fpm:8.0.10-alpine3.14-amd64
+        container_name: basephp
+        networks:
+            - backend
+        volumes:
+            - ../src:/var/www/html
+            - /var/www/html/docker/
+            - basesessions:/var/www/html/var/sessions
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
