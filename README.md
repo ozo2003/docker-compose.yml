@@ -10,5 +10,5 @@ docker-compose up --build -d
 127.0.0.1 base.docker.local basegateway.docker.local
 ```
 
-project: base.docker.local:8000
+project: base.docker.local:8000  
 traefik: basegateway.docker.local:8088
