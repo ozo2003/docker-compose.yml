@@ -88,10 +88,11 @@ services:
         #     - 6380:6379
 
     baseapache:
-        image: k0d3r1s/apache:20210831-rocky8.4-unsafe-amd64
+        image: k0d3r1s/apache:20210903-rocky8.4-unsafe-amd64
         container_name: baseapache
         depends_on:
             - basephp
+            - basegateway
         networks:
             - backend
             - frontend
@@ -108,12 +109,15 @@ services:
             - /etc/localtime:/etc/localtime:ro
         environment:
             DOCUMENT_ROOT: /var/www/html/public
-            APACHE_HOST: basephp
+            APACHE_HOST: baseapache
             PHP_HOST: basephp:9000
 
     basephp:
         image: k0d3r1s/php-fpm:8.0.10-alpine3.14-amd64
         container_name: basephp
+        # depends_on:
+        #     - baseredis
+        #     - basepostgres
         networks:
             - backend
         volumes:
