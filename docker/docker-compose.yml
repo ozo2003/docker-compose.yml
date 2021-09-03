@@ -10,7 +10,7 @@ networks:
 
 volumes:
     baseredisdata:
-    basepostgrelib:
+    basepostgreslib:
     basesessions:
 
 services:
@@ -64,7 +64,7 @@ services:
             POSTGRES_PASSWORD: 'password'
             TZ: "Europe/Riga"
         volumes:
-            - basepostgrelib:/var/lib/postgresql/data
+            - basepostgreslib:/var/lib/postgresql/data
             - ./postgres/data:/data
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
