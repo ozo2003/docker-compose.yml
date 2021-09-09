@@ -88,7 +88,7 @@ services:
         #     - 6380:6379
 
     baseapache:
-        image: k0d3r1s/apache:20210903-rocky8.4-unsafe-amd64
+        image: k0d3r1s/apache:20210908-rocky8.4-unsafe-amd64
         container_name: baseapache
         depends_on:
             - basephp
