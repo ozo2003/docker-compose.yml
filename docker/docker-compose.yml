@@ -16,7 +16,7 @@ volumes:
 services:
 
     basegateway:
-        image: k0d3r1s/traefik:2.5.3-alpine3.14-amd64
+        image: k0d3r1s/traefik:2.5.4-alpine3.14-amd64
         container_name: basegateway
         ports:
             - 8000:80
@@ -75,7 +75,7 @@ services:
         #     - 5433:5432
 
     baseredis:
-        image: redis:6.2.5-alpine3.14
+        image: redis:6.2.6-alpine3.14
         container_name: baseredis
         networks:
             - backend
@@ -88,7 +88,7 @@ services:
         #     - 6380:6379
 
     baseapache:
-        image: k0d3r1s/apache:20210923-rocky8.4-libre-amd64
+        image: k0d3r1s/apache:20211102-stream9_dev-libre-amd64
         container_name: baseapache
         depends_on:
             - basephp
@@ -113,7 +113,7 @@ services:
             PHP_HOST: basephp:9000
 
     basephp:
-        image: k0d3r1s/php-fpm:8.0.11-alpine3.14-amd64
+        image: k0d3r1s/php-fpm:8.0.12-alpine3.14-amd64
         container_name: basephp
         # depends_on:
         #     - baseredis
