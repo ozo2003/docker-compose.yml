@@ -16,7 +16,7 @@ volumes:
 services:
 
     basegateway:
-        image: k0d3r1s/traefik:2.5.4-alpine3.14-amd64
+        image: k0d3r1s/traefik:2.5.4
         container_name: basegateway
         ports:
             - 8000:80
