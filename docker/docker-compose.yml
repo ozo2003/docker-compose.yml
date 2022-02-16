@@ -109,7 +109,7 @@ services:
             PHP_HOST: basephp:9000
 
     basephp:
-        image: k0d3r1s/php-fpm:unstable
+        image: k0d3r1s/php-fpm:8.1-dev
         container_name: basephp
         # depends_on:
         #     - baseredis
