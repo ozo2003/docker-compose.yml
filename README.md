@@ -12,3 +12,6 @@ docker-compose up --build -d
 
 project: base.docker.local:8000  
 traefik: basegateway.docker.local:8088
+
+---
+#### If you found a problem, do not hesitate and [create an issue](https://github.com/ozo2003/docker-compose.yml/issues/new)
