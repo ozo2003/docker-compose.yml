@@ -58,7 +58,7 @@ services:
             retries: 3
 
     basepostgres:
-        image: postgres:13.6-alpine3.15
+        image: postgres:13.7-alpine3.16
         container_name: basepostgres
         environment:
             POSTGRES_PASSWORD: 'password'
@@ -86,7 +86,7 @@ services:
         #     - 6380:6379
 
     baseapache:
-        image: k0d3r1s/apache:ah3-latest
+        image: k0d3r1s/apache:unstable
         container_name: baseapache
         depends_on:
             - basephp
